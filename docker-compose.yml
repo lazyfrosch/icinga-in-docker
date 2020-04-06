@@ -23,7 +23,6 @@ services:
       ICINGADB_REDIS_ENABLE: 'true'
     volumes:
       - icinga_state:/var/lib/icinga2
-      - icinga_log:/var/log/icinga2
 
   icingadb:
     image: lazyfrosch/icingadb
@@ -62,6 +61,5 @@ services:
 
 volumes:
   icinga_state:
-  icinga_log:
   db_data:
   web_config:
