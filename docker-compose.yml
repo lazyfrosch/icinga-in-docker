@@ -1,0 +1,67 @@
+version: '2'
+
+services:
+  icinga2:
+    image: lazyfrosch/icinga2:2.12
+    build: .
+    depends_on:
+      - redis
+      - db
+    environment:
+      ICINGA_NODENAME: icinga2.localdomain
+      ICINGA_CA_ENABLE: 'true'
+      ICINGA_CA_TICKET_SALT: yoloops
+      ICINGA_API_USER_admin: test
+      ICINGA_CONCURRENT_CHECKS: 50
+      ICINGA_IDO_ENABLE: 'true'
+      ICINGA_IDO_HOST: db
+      ICINGA_IDO_NAME: icinga2
+      ICINGA_IDO_USERNAME: icinga
+      ICINGA_IDO_PASSWORD: rosebud
+      ICINGA_IDO_INSTALL: 'true'
+
+      ICINGA_DB_ENABLE: 'true'
+    volumes:
+      - icinga_state:/var/lib/icinga2
+      - icinga_log:/var/log/icinga2
+
+  icingadb:
+    image: lazyfrosch/icingadb
+    depends_on:
+      - db
+      - redis
+    environment:
+      ICINGA_REDIS_HOST: redis
+      ICINGA_MYSQL_HOST: db
+      ICINGA_MYSQL_DATABASE: icingadb
+      ICINGA_MYSQL_USERNAME: icinga
+      ICINGA_MYSQL_PASSWORD: rosebud
+
+  web:
+    image: lazyfrosch/icingaweb2:2.8
+    ports:
+      - 127.0.0.1:8080:80
+    volumes:
+      - web_config:/etc/icingaweb2
+    depends_on:
+      - db
+
+  redis:
+    image: redis:5-alpine
+
+  db:
+    image: mariadb:10.2
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql-databases.sql:/docker-entrypoint-initdb.d/mysql-databases.sql:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: onlyforadmin
+      MYSQL_DATABASE: icinga
+      MYSQL_USER: icinga
+      MYSQL_PASSWORD: rosebud
+
+volumes:
+  icinga_state:
+  icinga_log:
+  db_data:
+  web_config:
