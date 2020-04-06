@@ -20,7 +20,7 @@ services:
       ICINGA_IDO_PASSWORD: rosebud
       ICINGA_IDO_INSTALL: 'true'
 
-      ICINGA_DB_ENABLE: 'true'
+      ICINGADB_REDIS_ENABLE: 'true'
     volumes:
       - icinga_state:/var/lib/icinga2
       - icinga_log:/var/log/icinga2
